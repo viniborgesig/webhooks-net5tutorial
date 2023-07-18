@@ -55,7 +55,7 @@ namespace AirlineWeb.Controllers
                     return BadRequest(ex.Message);
                 }
 
-                var flightDetailReadDto = _mapper.Map<FlightDetailReadDto>(flightDetailCreateDto);
+                var flightDetailReadDto = _mapper.Map<FlightDetailReadDto>(flightDetailModel);
                 return CreatedAtRoute(nameof(GetFlightDetailsByCode), new { flightCode = flightDetailReadDto.FlightCode }, flightDetailReadDto);
             }
 
