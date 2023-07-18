@@ -11,5 +11,6 @@ namespace AirlineWeb.Data
         }
 
         public DbSet<WebhookSubscription> WebhookSubscriptions { get; set; }
+        public DbSet<FlightDetail> FlightDetails { get; set; }
     }
 }
