@@ -16,7 +16,7 @@ namespace AirlineWeb.MessageBus
                 Port = 5672
             };
 
-            using (var connection = connectionFactory.CreateConnection())
+            using (var connection = connectionFactory.CreateConnection(clientProvidedName: "AirlineWeb"))
             using (var channel = connection.CreateModel())
             {
                 channel.ExchangeDeclare(exchange: "trigger", type: ExchangeType.Fanout);
@@ -25,9 +25,9 @@ namespace AirlineWeb.MessageBus
                 var body = Encoding.UTF8.GetBytes(message);
 
                 channel.BasicPublish(exchange: "trigger",
-                                   routingKey: "",
-                                   basicProperties: null,
-                                   body: body);
+                                     routingKey: "",
+                                     basicProperties: null,
+                                     body: body);
 
                 Console.WriteLine("--> Mensagem publicada no Rabbit MQ.");
             }
