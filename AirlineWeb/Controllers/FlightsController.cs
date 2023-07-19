@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using AirlineWeb.Data;
 using AirlineWeb.Dtos;
+using AirlineWeb.MessageBus;
 using AirlineWeb.Models;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
@@ -14,11 +15,13 @@ namespace AirlineWeb.Controllers
     {
         private readonly AirlineDbContext _context;
         private readonly IMapper _mapper;
+        private readonly IMessageBusClient _messageBusClient;
 
-        public FlightsController(AirlineDbContext context, IMapper mapper)
+        public FlightsController(AirlineDbContext context, IMapper mapper, IMessageBusClient messageBusClient)
         {
             _context = context;
             _mapper = mapper;
+            _messageBusClient = messageBusClient;
         }
 
         [HttpGet("{flightCode}", Name = "GetFlightDetailsByCode")]
@@ -73,10 +76,31 @@ namespace AirlineWeb.Controllers
                 return NotFound();
             }
 
+            decimal oldPrice = flightDetail.Price;
+
+            _mapper.Map(flightDetailUpdateDto, flightDetail);
+
             try
             {
-                _mapper.Map(flightDetailUpdateDto, flightDetail);
                 _context.SaveChanges();
+
+                if (oldPrice == flightDetail.Price)
+                {
+                    Console.WriteLine("Sem alteração de preço.");
+                    return NoContent();
+                }
+
+                Console.WriteLine("Alteração de preço, mensagem será colocada no RabbitmQ.");
+
+                var notificationMessageDto = new NotificationMessageDto
+                {
+                    FlightCode = flightDetail.FlightCode,
+                    WebhookType = "Alteração de preço",
+                    OldPrice = oldPrice,
+                    NewPrice = flightDetail.Price
+                };
+
+                _messageBusClient.SendMessage(notificationMessageDto);
             }
             catch (Exception ex)
             {
