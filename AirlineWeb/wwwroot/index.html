@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
+    <title>ITERA Airlines - Webhook Registration</title>
+
+    <style>
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 30px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #fff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #800080; /* Purple color for h1 title */
+        }
+
+        label {
+            font-weight: bold;
+            color: #666;
+        }
+
+        input[type="text"],
+        select {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+
+        small.form-text {
+            color: #999;
+        }
+
+        .alert {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 4px;
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+
+        .alert-danger {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+
+        .btn-primary {
+            background-color: #800080;
+            border: 1px solid #800080;
+            color: #fff;
+            font-size: 20px;
+            padding: 15px 20px;
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            background-color: #6b006b;
+            border: 1px solid #6b006b;
+            color: #fff;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1 class="display-3 text-center my-4">ITERA Airlines</h1>
+        <h3 class="display-5 text-center my-4">Registro de Webhook</h3>
+
+        <div id="alertSuccess" class="alert alert-success">
+            <strong>Sucesso!!!</strong> <span id="successMessage"> Webhook registrado com sucesso.</span>
+        </div>
+
+        <div id="alertDanger" class="alert alert-danger">
+            <strong>Falha!!!</strong> <span id="dangerMessage"> Por favor, verifique o arquivo de logs.</span>
+        </div>
+
+        <div class="form-group">
+            <label for="webhookUriInput">URI</label>
+            <input class="form-control form-control-lg" type="text" id="webhookUriInput">
+            <small class="form-text text-muted">Sua Webhook URI não será compartilhada.</small>
+        </div>
+
+        <br />
+
+        <div class="form-group">
+            <label for="webhookType">Tipo</label>
+            <select class="form-control" id="webhookTypeSelect">
+                <option>Mudança de preço</option>
+                <option>Acentos disponíveis</option>
+                <option>Atrasos nos voos ou interrupções</option>
+            </select>
+        </div>
+
+        <br />
+
+        <div>
+            <button id="registerBtn" class="btn btn-primary btn-block" type="submit">Registrar</button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        var successBox = document.getElementById("alertSuccess");
+        var dangerBox = document.getElementById("alertDanger");
+        var successMessage = document.getElementById("successMessage");
+        var dangerMessage = document.getElementById("dangerMessage");
+        var webhookUriInput = document.getElementById("webhookUriInput");
+        var webhookTypeSelect = document.getElementById("webhookTypeSelect");
+        var registerBtn = document.getElementById("registerBtn");
+
+        successBox.style.display = 'none';
+        dangerBox.style.display = 'none';
+
+        registerBtn.onclick = function () {
+            successBox.style.display = 'none';
+            dangerBox.style.display = 'none';
+
+            if (webhookUriInput.value === "") {
+                dangerMessage.innerHTML = "Por favor, insira uma URI.";
+                dangerBox.style.display = "block";
+            }
+            else {
+                (async () => {
+                    const rawResponse = await fetch("https://localhost:5001/api/WebhookSubscriptions", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({ webhookUri: webhookUriInput.value, webhookType: webhookTypeSelect.value })
+                    });
+
+                    const content = await rawResponse.json();
+
+                    successMessage.innerHTML = "Webhook registrado, por favor use a palavra-chave: " + content.secret + " para validar a solicitação de entrada.";
+                    successBox.style.display = "block";
+                })();
+            }
+        };
+    </script>
+</body>
+
+</html>

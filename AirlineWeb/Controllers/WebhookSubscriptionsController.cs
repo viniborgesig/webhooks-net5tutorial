@@ -47,7 +47,7 @@ namespace AirlineWeb.Controllers
                 webhookSubscription = _mapper.Map<WebhookSubscription>(webhookSubscriptionCreateDto);
 
                 webhookSubscription.Secret = Guid.NewGuid().ToString();
-                webhookSubscription.WebhookPublisher = "LATAM Airlines";
+                webhookSubscription.WebhookPublisher = "ITERA Airlines";
 
                 try
                 {
