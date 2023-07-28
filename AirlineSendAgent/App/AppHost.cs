@@ -45,11 +45,11 @@ namespace AirlineSendAgent.App
 
                 Console.WriteLine("Escutando o RabbitMQ...");
 
-                consumer.Received += async (ModuleHandle, EventArgs) =>
+                consumer.Received += async (ModuleHandle, ea) =>
                 {
                     Console.WriteLine("Evento foi disparado...");
 
-                    var body = EventArgs.Body;
+                    var body = ea.Body;
                     var notificationMessage = Encoding.UTF8.GetString(body.ToArray());
                     var notificationMessageDto = JsonSerializer.Deserialize<NotificationMessageDto>(notificationMessage);
 

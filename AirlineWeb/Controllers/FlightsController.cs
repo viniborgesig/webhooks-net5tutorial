@@ -95,7 +95,7 @@ namespace AirlineWeb.Controllers
                 var notificationMessageDto = new NotificationMessageDto
                 {
                     FlightCode = flightDetail.FlightCode,
-                    WebhookType = "Alteração de preço",
+                    WebhookType = "PriceChange",
                     OldPrice = oldPrice,
                     NewPrice = flightDetail.Price
                 };

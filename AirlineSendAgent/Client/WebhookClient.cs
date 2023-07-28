@@ -20,7 +20,18 @@ namespace AirlineSendAgent.Client
         {
             var serializedPayload = JsonSerializer.Serialize(flightDetailChangePayloadDto);
 
-            var httpClient = _httpClientFactory.CreateClient();
+            var handler = new HttpClientHandler
+            {
+                ServerCertificateCustomValidationCallback = (request, cert, chain, errors) =>
+                {
+                    Console.WriteLine("SSL error skipped");
+                    return true;
+                }
+            };
+
+            HttpClient httpClient = new HttpClient(handler);
+
+            // var httpClient = _httpClientFactory.CreateClient();
 
             var request = new HttpRequestMessage(HttpMethod.Post,
                                                  flightDetailChangePayloadDto.WebhookURI);
